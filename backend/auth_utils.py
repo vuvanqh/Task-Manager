@@ -1,7 +1,9 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
-import os
+import os,dotenv
+
+dotenv.load_dotenv()
 
 passwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("JWT_SECRET")
