@@ -3,10 +3,18 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError
 from models import *
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from db import get_con
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True, 
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 #helpers
@@ -18,12 +26,14 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid Token")
     
+    if not username:    
+        raise HTTPException(status_code=401, detail="Invalid Token payload")
     user=crud_users.get_user_by_username(username)
     if not user: 
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
-def require_roles(*allowed): #is the nested funciton necessary here
+def require_roles(*allowed): 
     def role_dep(user = Depends(get_current_user)):
         if user["role"] not in allowed and user["role"]!="admin":
             raise HTTPException(status_code=403, detail="Unauthorized access")
@@ -42,8 +52,11 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         "access_token": token,
         "token_type": "bearer"
     }
+
 @app.post("/auth/register")
 def register(payload: UserCreate):
+    if crud_users.get_user_by_username(payload.username) or crud_users.get_user_by_email(payload.email):
+        raise HTTPException(status_code=400, detail="Username or email already registered")
     crud_users.create_user(payload.username,payload.email,payload.password)
     return {"status": "ok"}
 
@@ -53,18 +66,38 @@ def create_project(payload: ProjectCreate, manager = Depends(require_roles("mana
     crud_tasks.create_project(payload.name, manager["id"], payload.description)
     return {"status": "ok"}
 
+@app.put("/projects/{project_id}")
+def edit_project(project_id: int, payload: ProjectCreate, manager = Depends(require_roles("manager"))):
+    crud_tasks.edit_project(project_id, payload.name, payload.description)
+    return {"status": "ok"}
+
+@app.delete("/projects/{project_id}")
+def delete_project(project_id: int, manager = Depends(require_roles("manager"))):
+    crud_tasks.delete_project(project_id)
+    return {"status": "ok"}
+
 @app.post("/tasks")
 def create_task(payload: TaskCreate, manager = Depends(require_roles("manager"))):
-    crud_tasks.create_task(payload.title, payload.project_id, payload.description)
+    crud_tasks.create_task(payload.title, payload.project_id, payload.description, payload.priority)
+    return {"status": "ok"}
+
+@app.put("/tasks/{task_id}")
+def edit_task(task_id: int, payload: TaskCreate, manager = Depends(require_roles("manager"))):
+    crud_tasks.edit_task(task_id, payload.title, payload.description, payload.priority)
+    return {"status": "ok"}
+
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: int, manager = Depends(require_roles("manager"))):
+    crud_tasks.delete_task(task_id)
     return {"status": "ok"}
 
 @app.post("/tasks/{task_id}/assign")
 def assign_task(task_id: int, user=Depends(get_current_user)):
-    crud_tasks.assign_user_to_task(task_id, user["id"], state="requested")
+    crud_tasks.assign_to_task(task_id, user["id"], status="requested")
     return {"status": "requested"}
 
 @app.post("/tasks/{task_id}/complete")
-def mark_complete(task_id: int, user=Depends(get_current_user,"manager")):
+def mark_complete(task_id: int, user=Depends(get_current_user)):
     task = crud_tasks.get_task(task_id)
     if not task: 
         raise HTTPException(status_code=404, detail="Task not found")
@@ -76,18 +109,31 @@ def mark_complete(task_id: int, user=Depends(get_current_user,"manager")):
     crud_tasks.update_task_status(task_id, "completed")
     return {"status": "completed"}
 
+import smtplib, dotenv, os
+dotenv.load_dotenv()
 #passwd
 @app.post("/auth/reset/request")
 def reset_request(payload: ResetPasswdRequest):
+    sender = "qouchoang.vuvan@gmail.com"
     user = crud_users.get_user_by_email(payload.email)
     if not user: return {"status": "ok"}
-    token = str(uuid.uuid4()) #what is this
+    token = str(uuid.uuid4()) 
     token_hash = hashlib.sha256(token.encode()).hexdigest()
-    expires_at = datetime.now() + timedelta(hours = 1)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours = 1)
     con = get_con(); cur = con.cursor()
     cur.execute("insert into PasswordResets (user_id, token_hash, expires_at) values (?, ?, ?)",
                 (user["id"], token_hash, expires_at))
     con.commit(); cur.close(); con.close()
+    message = f"""Subject: Password Reset Request\n\n
+        Use the following token to reset your password. It is valid for 1 hour.
+        Token: {token}
+    """
+    server = smtplib.SMTP("smtp.gmail.com")
+    server.starttls()
+    server.login(sender, os.getenv("MY_PASSWD"))
+    server.sendmail(from_addr=sender, to_addrs=payload.email, msg=message)
+    server.quit()
+    return {"status": "ok"}
 
 @app.post("/auth/reset/confirm")
 def reset_confirm(payload: ResetPasswdConfirm):
@@ -95,11 +141,11 @@ def reset_confirm(payload: ResetPasswdConfirm):
     con = get_con(); cur = con.cursor()
     cur.execute("select user_id, expires_at from PasswordResets where token_hash=?",(token_hash,))
     row = cur.fetchone()
-    if not row or row[1] < datetime.now():
+    if not row or row[1] < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Invaild or expired token")
     new_hash =  auth_utils.hash_passwd(payload.new_passwd)
     cur.execute("update Users set password_hash=? where id=?", (new_hash,row[0]))
-    cur.execute("delete from PasswordResets where token_hash=?", (token_hash))
+    cur.execute("delete from PasswordResets where token_hash=?", (token_hash,))
     con.commit(); cur.close(); con.close()
     return {"status": "password updated"}
 
@@ -113,3 +159,33 @@ def promote_user(user_id: int, admin = Depends(require_roles("admin"))):
         raise HTTPException(status_code=400, detail="User already manager or admin")
     crud_users.set_manager(user_id)
     return {"status": "ok"}
+
+
+#listing
+@app.get("/projects")
+def list_projects(user=Depends(get_current_user)):
+    con = get_con(); cur = con.cursor()
+    cur.execute("select id, name, description, created_at, username from Projects")
+    rows = cur.fetchall()
+    cur.close(); con.close()
+    return {"projects": [{
+        "id": row[0],
+        "name": row[1],
+        "description": row[2],
+        "created_at": row[3],
+        "created_by": row[4]
+    } for row in rows] } 
+
+@app.get("/projects/{project_id}/tasks")
+def list_tasks(project_id: int, user=Depends(get_current_user)):
+    con = get_con(); cur = con.cursor()
+    cur.execute("select id, title, status, assigned_to, priority from Tasks where project_id=?", (project_id,))
+    rows = cur.fetchall()
+    cur.close(); con.close()
+    return {"tasks": [{
+        "id": row[0],
+        "title": row[1],
+        "status": row[2],
+        "assigned_to": row[3],
+        "priority": row[4]
+    } for row in rows] }

@@ -60,6 +60,8 @@ def init_tables():
                 project_id int not null references Projects(id),
                 title nvarchar(200) not null,
                 status nvarchar(50) not null,
+                description nvarchar(max),
+                priority int not null default 1,
                 assigned_to int references Users(id),
                 created_at datetime2 default sysutcdatetime());
                 """)

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pyjwt
+passlib[bcrypt]
+pyodbc
+python-dotenv
+email-validator
+pytest
+httpx

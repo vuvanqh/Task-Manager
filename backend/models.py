@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
+from datetime import datetime
 
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3)
@@ -13,13 +14,13 @@ class UserLogin(BaseModel):
 class ProjectCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    deadline: Optional[str] = None
+    created_at: Optional[datetime] = None
 
 class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
     priority: int = 1
-    project_id: Optional[int] = None
+    project_id: int = None
 
 class ResetPasswdRequest(BaseModel):
     email: EmailStr
