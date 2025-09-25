@@ -25,7 +25,7 @@ def create_access_token(subject: str, role: str, expires_minutes: int = ACCESS_E
         "role": role,
         "exp": int(expire.timestamp())
     }
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=[ALGO])
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGO)
 
 def decode_token(token: str) -> str:
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGO])

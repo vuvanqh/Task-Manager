@@ -78,7 +78,7 @@ def delete_project(project_id: int, manager = Depends(require_roles("manager")))
 
 @app.post("/tasks")
 def create_task(payload: TaskCreate, manager = Depends(require_roles("manager"))):
-    crud_tasks.create_task(payload.title, payload.project_id, payload.description, payload.priority)
+    crud_tasks.create_task(payload.title, payload.project_id, description = payload.description, priority=payload.priority)
     return {"status": "ok"}
 
 @app.put("/tasks/{task_id}")
@@ -165,7 +165,7 @@ def promote_user(user_id: int, admin = Depends(require_roles("admin"))):
 @app.get("/projects")
 def list_projects(user=Depends(get_current_user)):
     con = get_con(); cur = con.cursor()
-    cur.execute("select id, name, description, created_at, username from Projects")
+    cur.execute("select id, name, description, created_at, created_by from Projects")
     rows = cur.fetchall()
     cur.close(); con.close()
     return {"projects": [{
@@ -189,3 +189,33 @@ def list_tasks(project_id: int, user=Depends(get_current_user)):
         "assigned_to": row[3],
         "priority": row[4]
     } for row in rows] }
+
+@app.get("/projects/{project_id}/tasks/{task_id}")
+def get_task(task_id: int):
+    con = get_con(); cur = con.cursor()
+    cur.execute("select id, project_id, title, status, description, priority, assigned_to from Tasks where id=?", (task_id,))
+    row = cur.fetchone()
+    cur.close(); con.close()
+    return {
+        "id": row[0],
+        "project_id": row[1],
+        "title": row[2],
+        "status": row[3],
+        "description": row[4],
+        "priority": row[5],
+        "assigned_to": row[6]
+    }
+
+@app.get("/admin/users")
+def get_users():
+    con = get_con(); cur = con.cursor()
+    cur.execute("select id, username, email, role from Users")
+    rows = cur.fetchall()
+    cur.close(); con.close()
+    return {"users": [
+        {
+            "id": row[0],
+            "username": row[1],
+            "email": row[2],
+            "role": row[3]
+        } for row in rows]}
