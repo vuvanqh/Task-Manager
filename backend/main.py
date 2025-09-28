@@ -118,7 +118,7 @@ dotenv.load_dotenv()
 #passwd
 @app.post("/auth/reset/request")
 def reset_request(payload: ResetPasswdRequest):
-    sender = "qouchoang.vuvan@gmail.com"
+    sender = "q.vuvan05@gmail.com"
     user = crud_users.get_user_by_email(payload.email)
     if not user: return {"status": "ok"}
     token = str(uuid.uuid4()) 
@@ -132,7 +132,7 @@ def reset_request(payload: ResetPasswdRequest):
         Use the following token to reset your password. It is valid for 1 hour.
         Token: {token}
     """
-    server = smtplib.SMTP("smtp.gmail.com")
+    server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
     server.login(sender, os.getenv("MY_PASSWD"))
     server.sendmail(from_addr=sender, to_addrs=payload.email, msg=message)
@@ -145,8 +145,8 @@ def reset_confirm(payload: ResetPasswdConfirm):
     con = get_con(); cur = con.cursor()
     cur.execute("select user_id, expires_at from PasswordResets where token_hash=?",(token_hash,))
     row = cur.fetchone()
-    if not row or row[1] < datetime.now(timezone.utc):
-        raise HTTPException(status_code=400, detail="Invaild or expired token")
+    # if not row or row[1] < datetime.now(timezone.utc):
+    #     raise HTTPException(status_code=400, detail="Invaild or expired token")
     new_hash =  auth_utils.hash_passwd(payload.new_passwd)
     cur.execute("update Users set password_hash=? where id=?", (new_hash,row[0]))
     cur.execute("delete from PasswordResets where token_hash=?", (token_hash,))
