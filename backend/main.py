@@ -184,7 +184,7 @@ def list_projects(user=Depends(get_current_user)):
 def list_tasks(project_id: int, user=Depends(get_current_user)):
     con = get_con(); cur = con.cursor()
     cur.execute("select id, title, status, assigned_to, priority from Tasks where project_id=?", (project_id,))
-    rows = cur.fetchone()
+    rows = cur.fetchall()
     cur.close(); con.close()
     return {"tasks": [{
         "id": row[0],
@@ -205,7 +205,7 @@ def get_task(task_id: int):
 def get_project(project_id: int, user=Depends(get_current_user)):
     con = get_con(); cur = con.cursor()
     cur.execute("select id, name, description, created_at, created_by from Projects where id=?",(project_id,))
-    row = cur.fetchall()
+    row = cur.fetchone()
     cur.close(); con.close()
     return {
         "id": row[0],

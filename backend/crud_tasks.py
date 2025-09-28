@@ -50,20 +50,6 @@ def assign_to_task(task_id: int, user_id: int, status: str = "assigned"):
                 (user_id, status, task_id))
     con.commit(); cur.close(); con.close()
 
-def get_task(task_id: int):
-    con = get_con(); cur = con.cursor()
-    cur.execute("select id, title, status, assigned_to, priority, description  from Tasks where id=?", (task_id,))
-    row = cur.fetchone()
-    if not row: return None
-    return {
-        "id": row[0],
-        "title": row[1],
-        "status": row[2],
-        "assigned_to": row[3],
-        "priority": row[4],
-        "descriptoin": row[5]
-    }
-
 def update_task_status(task_id: int, status: str):
     con = get_con(); cur = con.cursor()
     cur.execute("update Tasks set status=? where id=?", (status,task_id))
