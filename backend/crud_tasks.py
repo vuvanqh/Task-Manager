@@ -10,6 +10,7 @@ def create_project(name: str, owner_id: int, description: Optional[str] = None):
 
 def delete_project(project_id: int):
     con = get_con(); cur = con.cursor()
+    cur.execute("delete from Tasks where project_id=?", (project_id,))
     cur.execute("delete from Projects where id=?", (project_id,))
     con.commit(); cur.close(); con.close()
 
@@ -30,10 +31,17 @@ def delete_task(task_id: int):
     cur.execute("delete from Tasks where id=?", (task_id,))
     con.commit(); cur.close(); con.close()
 
-def edit_task(task_id: int, title: str, description: str, priority: int = 1):
+def edit_task(task_id: int, title: str, assigned_to: Optional[int] = None, description: Optional[str] = None, priority: int = 1):
     con = get_con(); cur = con.cursor()
-    cur.execute("update Tasks set title=?, description=?, priority=? where id=?",
-                (title, description, priority, task_id))
+    updates = ['title=?','description=?','priority=?']
+    params = [title, description, priority]
+    if assigned_to is not None:
+        updates.append("assigned_to=?")
+        priority.append(assigned_to)
+
+    params.append(task_id)
+    cur.execute(f"update Tasks set {', '.join(updates)} where id=?",
+                tuple(params))
     con.commit(); cur.close(); con.close()
 
 def assign_to_task(task_id: int, user_id: int, status: str = "assigned"):
@@ -44,7 +52,7 @@ def assign_to_task(task_id: int, user_id: int, status: str = "assigned"):
 
 def get_task(task_id: int):
     con = get_con(); cur = con.cursor()
-    cur.execute("select id, title, status, assigned_to, priority from Tasks where id=?", (task_id,))
+    cur.execute("select id, title, status, assigned_to, priority, description  from Tasks where id=?", (task_id,))
     row = cur.fetchone()
     if not row: return None
     return {
@@ -52,10 +60,26 @@ def get_task(task_id: int):
         "title": row[1],
         "status": row[2],
         "assigned_to": row[3],
-        "priority": row[4]
+        "priority": row[4],
+        "descriptoin": row[5]
     }
 
 def update_task_status(task_id: int, status: str):
     con = get_con(); cur = con.cursor()
     cur.execute("update Tasks set status=? where id=?", (status,task_id))
     con.commit(); cur.close(); con.close()
+
+def get_task(task_id: int):
+    con = get_con(); cur = con.cursor()
+    cur.execute("select id, project_id, title, status, description, priority, assigned_to from Tasks where id=?", (task_id,))
+    row = cur.fetchone()
+    cur.close(); con.close()
+    return {
+        "id": row[0],
+        "project_id": row[1],
+        "title": row[2],
+        "status": row[3],
+        "description": row[4],
+        "priority": row[5],
+        "assigned_to": row[6]
+    }

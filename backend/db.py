@@ -7,7 +7,7 @@ DB_NAME = "TaskManagerDB"
 
 def get_con(db = DB_NAME):
     connection = (f"DRIVER={{{ODBC_DRIVER}}};"
-                  f"SERVER={SERVER};DATABASE={db};UID={USER};PWD={PWD};Encrypt=yes;TrustServerCertificate=no;")
+                  f"SERVER={SERVER};DATABASE={db};UID={USER};PWD={PWD};Encrypt=yes;TrustServerCertificate=yes;")
     return pyodbc.connect(connection, autocommit = True)
 
 def check_existance():

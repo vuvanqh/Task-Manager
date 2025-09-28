@@ -5,7 +5,7 @@ import os,dotenv
 
 dotenv.load_dotenv()
 
-passwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+passwd_ctx = Cpasswd_ctx = CryptContext(schemes=["argon2"], deprecated="auto")
 SECRET_KEY = os.getenv("JWT_SECRET")
 if not SECRET_KEY:
     raise RuntimeError("No JWT_SECRET env var set")

@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://51.21.202.23:5173"],
     allow_credentials=True, 
     allow_methods=["*"],
     allow_headers=["*"]
@@ -83,7 +83,7 @@ def create_task(payload: TaskCreate, manager = Depends(require_roles("manager"))
 
 @app.put("/tasks/{task_id}")
 def edit_task(task_id: int, payload: TaskCreate, manager = Depends(require_roles("manager"))):
-    crud_tasks.edit_task(task_id, payload.title, payload.description, payload.priority)
+    crud_tasks.edit_task(task_id, title=payload.title, description=payload.description, priority=payload.priority, assigned_to=payload.assigned_to)
     return {"status": "ok"}
 
 @app.delete("/tasks/{task_id}")
@@ -92,9 +92,13 @@ def delete_task(task_id: int, manager = Depends(require_roles("manager"))):
     return {"status": "ok"}
 
 @app.post("/tasks/{task_id}/assign")
-def assign_task(task_id: int, user=Depends(get_current_user)):
-    crud_tasks.assign_to_task(task_id, user["id"], status="requested")
-    return {"status": "requested"}
+def assign_task(task_id: int, payload: TaskCreate):
+    task = crud_tasks.get_task(task_id)
+    if task["status"] in ["completed", "failed"]:
+        raise HTTPException(status_code=400, detail=f"Task already {task["status"]}")
+    
+    crud_tasks.assign_to_task(task_id, payload.user_id, status="assigned")
+    return {"status": "assigned"}
 
 @app.post("/tasks/{task_id}/complete")
 def mark_complete(task_id: int, user=Depends(get_current_user)):
@@ -180,7 +184,7 @@ def list_projects(user=Depends(get_current_user)):
 def list_tasks(project_id: int, user=Depends(get_current_user)):
     con = get_con(); cur = con.cursor()
     cur.execute("select id, title, status, assigned_to, priority from Tasks where project_id=?", (project_id,))
-    rows = cur.fetchall()
+    rows = cur.fetchone()
     cur.close(); con.close()
     return {"tasks": [{
         "id": row[0],
@@ -192,19 +196,24 @@ def list_tasks(project_id: int, user=Depends(get_current_user)):
 
 @app.get("/projects/{project_id}/tasks/{task_id}")
 def get_task(task_id: int):
+    task = crud_tasks.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+@app.get("/projects/{project_id}")
+def get_project(project_id: int, user=Depends(get_current_user)):
     con = get_con(); cur = con.cursor()
-    cur.execute("select id, project_id, title, status, description, priority, assigned_to from Tasks where id=?", (task_id,))
-    row = cur.fetchone()
+    cur.execute("select id, name, description, created_at, created_by from Projects where id=?",(project_id,))
+    row = cur.fetchall()
     cur.close(); con.close()
     return {
         "id": row[0],
-        "project_id": row[1],
-        "title": row[2],
-        "status": row[3],
-        "description": row[4],
-        "priority": row[5],
-        "assigned_to": row[6]
-    }
+        "name": row[1],
+        "description": row[2],
+        "created_at": row[3],
+        "created_by": row[4]
+    } 
 
 @app.get("/admin/users")
 def get_users():

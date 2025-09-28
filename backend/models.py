@@ -19,6 +19,7 @@ class ProjectCreate(BaseModel):
 class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
+    assigned_to: Optional[int] = None
     priority: int = 1
     project_id: int = None
 
