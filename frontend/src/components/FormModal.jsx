@@ -5,7 +5,7 @@ export default function FormModal({handleSubmit,formSubject, editData, children,
     const navigate = useNavigate();
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96">
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-md">
             <h3 className="font-bold mb-3">
                 {editData ? `Edit ${formSubject}` : `New ${formSubject}`}
             </h3>

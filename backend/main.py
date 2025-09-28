@@ -97,7 +97,7 @@ def assign_task(task_id: int, payload: TaskCreate):
     if task["status"] in ["completed", "failed"]:
         raise HTTPException(status_code=400, detail=f"Task already {task["status"]}")
     
-    crud_tasks.assign_to_task(task_id, payload.user_id, status="assigned")
+    crud_tasks.assign_to_task(task_id, payload.assign_to, status="assigned")
     return {"status": "assigned"}
 
 @app.post("/tasks/{task_id}/complete")

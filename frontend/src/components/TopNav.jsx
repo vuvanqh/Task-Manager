@@ -1,9 +1,17 @@
 import {Link} from "react-router-dom";
 import Logo from "../assets/no-projects.png";
 import Button from "./Button";
+import { useEffect } from "react";
 
 export default function TopNav({user, onLogout})
 {
+    const token = localStorage.getItem("token");
+    
+    useEffect(()=>{
+        if(!token)
+            onLogout();
+    },[token]);
+
     return (
         <header className ="bg-black text-stone-50 flex items-center justify-between px-6"
                 style={{height: "64px"}}>

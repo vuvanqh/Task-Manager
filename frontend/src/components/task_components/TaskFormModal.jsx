@@ -10,7 +10,7 @@ export default function TaskFormModal({onClose, onSaved, projectId, editData,tas
     const [description, setDescription] = useState(editData?.description || "");
     const [priority, setPriority] = useState(editData?.priority || 1);
     const [error, setError] = useState("");
-    const [assignedTo, setAssignedTo] = useState(task.assigned_to);
+    const [assignedTo, setAssignedTo] = useState(task?.assigned_to);
     async function handleSubmit(e)
     {
         e.preventDefault();
@@ -42,7 +42,7 @@ export default function TaskFormModal({onClose, onSaved, projectId, editData,tas
             <Input label = "Task Title" value={title} onChange={ e => setTitle(e.target.value)} placeholder="Task Title" required/>
             <Input label = "Task Description" value={description} onChange={ e => setDescription(e.target.value)} placeholder="Task Description" rows={4} isTextarea={true}/>
             <Input label = "Task Priority" type="number" value={priority} onChange={e => setPriority(e.target.value)} min={1} max={5}/>
-            <Input label = "Assigned To" type="number" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} min={1} max={5}/>
+            <Input label = "Assigned To" type="number" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} placeholder="User Id" min={1} max={5}/>
         </FormModal>
     )
 }

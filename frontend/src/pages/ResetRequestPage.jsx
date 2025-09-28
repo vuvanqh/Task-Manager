@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { requestReset } from "../api/auth";
 import Button from "../components/Button";
 import Input from "../components/Input";
-import { findAllInRenderedTree } from "react-dom/test-utils";
 
 export default function ResetRequestPage() {
     const [email, setEmail] = useState("");

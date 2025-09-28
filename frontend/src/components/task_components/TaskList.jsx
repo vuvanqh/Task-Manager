@@ -3,7 +3,7 @@ import { useEffect, useState} from 'react'
 import { getTasksForProject, completeTask } from '../../api/tasks';   
 import Button from '../Button'
 
-export default function TaskList({projectId,onClick}) {
+export default function TaskList({projectId,onClick,reload}) {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -27,6 +27,7 @@ export default function TaskList({projectId,onClick}) {
     {
         try {
             await completeTask(id);
+            reload();   
         }
         catch
         {
@@ -48,7 +49,7 @@ export default function TaskList({projectId,onClick}) {
                     </div>
                 <ul className="space-y-2">
                     {tasks.map(t => (
-                        <li key={t.id} className={`p-3 border rounded ${t.status=="complete"?"bg-green-400":"bg-white"} hover:bg-stone-100`}>
+                        <li key={t.id} className={`p-3 border rounded ${t.status=="completed"?"bg-green-400 hover:bg-green-300":"bg-white hover:bg-stone-100"}`}>
                             <div className='flex'>
                                 <Link to={`/projects/${projectId}/tasks/${t.id}`}>
                                 <span className="font-semibold">{t.title}</span> - {t.status}                           

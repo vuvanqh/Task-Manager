@@ -54,9 +54,9 @@ export default function ProjectView()
         }
     }
     if(loading || !project)
-        return <div className="w-[35rem] mt-16 flex-col">Loading...</div>
+        return <div className="w-full max-w-3xl mt-8 p-4 md:mt-16 md:p-6 flex-col">Loading...</div>
     return (
-        <div className="w-[35rem] mt-16 flex-col">
+        <div className="w-full max-w-3xl mt-8 p-4 md:mt-16 md:p-6 flex-col">
             <header className="pb-4 mb-4 ">
                 <div className="flex items-center justify-between">
                     <h1 className="text-5xl font-bold text-stone-600 mb-2">
@@ -71,7 +71,7 @@ export default function ProjectView()
             <hr style={{height: "2px", "backgroundColor": "#333"}}/>
             <br/>      
             <Outlet/>
-           <TaskList key={reloadTasks} projectId={project.id} onClick = {()=>setShowAdd(true)}/>
+           <TaskList key={reloadTasks} projectId={project.id} onClick = {()=>setShowAdd(true)} reload={()=>setReloadTasks(reloadTasks+1)}/>
            {showAdd && (
                     <TaskFormModal
                     projectId={project.id}

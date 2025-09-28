@@ -37,7 +37,7 @@ def edit_task(task_id: int, title: str, assigned_to: Optional[int] = None, descr
     params = [title, description, priority]
     if assigned_to is not None:
         updates.append("assigned_to=?")
-        priority.append(assigned_to)
+        params.append(assigned_to)
 
     params.append(task_id)
     cur.execute(f"update Tasks set {', '.join(updates)} where id=?",

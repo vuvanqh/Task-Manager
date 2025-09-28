@@ -40,8 +40,9 @@ export default function AdminPage()
                     <div key={u.id} className="p-3 border rounded flex justify-between">
                         <div>
                             <div className="font-semibold">{u.username}</div>
-                            <span className="text-xs opacity-70">•{u.email}</span>
-                            <span className="text-xs opacity-70">•{u.role}</span>
+                            <p className="text-xs opacity-70">•{u.email}</p>
+                            <p className="text-xs opacity-70">•{u.role}</p>
+                            <p className="text-xs opacity-70">•{u.id}</p>
                         </div>
                         <div>
                             {u.role==="user" && <button onClick={()=>promote(u.id)} className='px-3 py-1 bg-blue-400 text-stone-400 bg-stone-950 rounded'>Promote</button>}

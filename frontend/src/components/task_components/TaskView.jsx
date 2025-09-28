@@ -2,7 +2,6 @@ import {useParams, useNavigate} from 'react-router-dom'
 import {useEffect, useState} from 'react';
 import { getTask, deleteTask} from '../../api/tasks';
 import TaskFormModal from './TaskFormModal'
-import {createPortal} from 'react-dom'
 
 export default function TaskView()
 {
