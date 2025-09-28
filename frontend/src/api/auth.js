@@ -5,7 +5,13 @@ const oauthClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL || "http://51.21.202.23:8000",
     headers: {"Content-Type": "application/x-www-form-urlencoded"}
 });
-
+oauthClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => { Promise.reject(error) });
 
 export const login = async (username, password) =>
 {
