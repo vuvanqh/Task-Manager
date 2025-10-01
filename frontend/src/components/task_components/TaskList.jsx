@@ -39,28 +39,29 @@ export default function TaskList({projectId,onClick,reload}) {
 
     return (
         <>
-            {loading ? <div>Loading...</div>:  tasks.length===0? "No tasks yet" : 
-                <section className="pb-4 mb-4 ">
-                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-stone-600 mb-2">
-                            Tasks
-                        </h1>
-                        <Button onClick={onClick}>+ New Task</Button>
-                    </div>
-                <ul className="space-y-2">
-                    {tasks.map(t => (
-                        <li key={t.id} className={`p-3 border rounded ${t.status=="completed"?"bg-green-400 hover:bg-green-300":"bg-white hover:bg-stone-100"}`}>
-                            <div className='flex'>
-                                <Link to={`/projects/${projectId}/tasks/${t.id}`}>
-                                <span className="font-semibold">{t.title}</span> - {t.status}                           
-                                </Link>
-                                <button style={{marginLeft: "auto"}} className={`px-4 ${t.status=="complete"?"bg-green-400 text-white hover:bg-stone-400":"bg-white text-black hover:bg-green-200"} rounded-md ml-1`} onClick={()=>markComplete(t.id)} disabled={t.status==="complete"}>complete</button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            </section>
-            }
+         <section className="pb-4 mb-4 ">
+            <div className="flex items-center justify-between py-4">
+                <h1 className="text-2xl font-bold text-stone-600 mb-2">
+                    Tasks
+                </h1>
+                
+                <Button onClick={onClick}>+ New Task</Button>
+            </div>
+                {loading ? <div>Loading...</div>:  tasks.length===0? <div>No tasks yet</div> : 
+                    <ul className="space-y-2">
+                        {tasks.map(t => (
+                            <li key={t.id} className={`p-3 border rounded ${t.status=="completed"?"bg-green-400 hover:bg-green-300":"bg-white hover:bg-stone-100"}`}>
+                                <div className='flex'>
+                                    <Link to={`/projects/${projectId}/tasks/${t.id}`}>
+                                    <span className="font-semibold">{t.title}</span> - {t.status}                           
+                                    </Link>
+                                    <button style={{marginLeft: "auto"}} className={`px-4 ${t.status=="completed"?"bg-green-400 text-white hover:bg-stone-400":"bg-white text-black hover:bg-green-200"} rounded-md ml-1`} onClick={()=>markComplete(t.id)} disabled={t.status==="complete"}>complete</button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                }
+         </section>
         </>
     )
 }

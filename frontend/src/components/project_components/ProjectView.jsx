@@ -1,8 +1,7 @@
 import {useState, useEffect} from 'react'
-import { deleteTask, getTasksForProject } from '../../api/tasks'
 import { deleteProject, getProject } from '../../api/projects';
 import TaskFormModal from '../task_components/TaskFormModal'
-import {useNavigate, useParams, Outlet,useOutlet} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
 import TaskList from '../task_components/TaskList'
 import Button from '../Button';
 
@@ -43,10 +42,10 @@ export default function ProjectView()
     {
         if(!confirm("Delete task?")) return;
         try {
-           {/*delete tasks as well in backend */}
-
             await deleteProject(project.id);
-            navigate("/projects")
+            const num = localStorage.getItem("project_number");
+            localStorage.setItem("project_number",num-1);
+            navigate("/projects/")
         }
         catch(e)
         {
@@ -70,7 +69,6 @@ export default function ProjectView()
             </header>
             <hr style={{height: "2px", "backgroundColor": "#333"}}/>
             <br/>      
-            <Outlet/>
            <TaskList key={reloadTasks} projectId={project.id} onClick = {()=>setShowAdd(true)} reload={()=>setReloadTasks(reloadTasks+1)}/>
            {showAdd && (
                     <TaskFormModal

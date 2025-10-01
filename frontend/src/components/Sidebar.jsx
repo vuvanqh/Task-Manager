@@ -14,6 +14,7 @@ export default function Sidebar({ selectedID, onSelect, canCreate = true, onCrea
         try {
             const data = await getProjects();
             setProjects(data);
+            localStorage.setItem("project_number",projects.length);
         }
         catch(e) {
             console.error(e);
@@ -23,7 +24,7 @@ export default function Sidebar({ selectedID, onSelect, canCreate = true, onCrea
         }
     }
 
-    useEffect(() => {load()}, []);
+    useEffect(() => {load()}, [localStorage.getItem("project_number")]);
     const filtered = projects.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
 
     return <aside className="w-1/4 px-8 py-16 bg-black text-stone-50 md:w-72 rounded-r-xl">

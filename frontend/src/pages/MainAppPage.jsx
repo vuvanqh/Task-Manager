@@ -16,9 +16,9 @@ export default function MainAppPage({auth})
 
     function handleLogout()
     {
-        if(!localStorage.getItem("role")) localStorage.removeItem("role");
-        if(!localStorage.getItem("username")) localStorage.removeItem("username");
-        if(!localStorage.getItem("token")) localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("username");
+        localStorage.removeItem("token");
         navigate("/")
     }
 
