@@ -10,8 +10,13 @@ export default function ProtectedRoute({roles, children})
     {
         try {
             const payload = jwtDecode(token);
-            const role = payload.role;
-            if(!roles.includes(role)) return <Navigate to="/projects" replace/>;
+            if(payload.exp && Date.now()/1000 > payload.exp){
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                localStorage.removeItem("username");
+                return <Navigate to="/login" replace/>;
+            }
+            if(!roles.includes(payload.role)) return <Navigate to="/projects" replace/>;
         }
         catch(e)
         {

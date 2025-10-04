@@ -1,5 +1,5 @@
 
-const classes = "w-full p-1 border-2 rounded-sm border-stone-300 bg-stone-200 text-stone-600 focus:outline-none focus:border-stone-500"
+const classes = "w-full p-2 border-2 rounded-sm border-stone-300 bg-stone-200 text-stone-600 focus:outline-none focus:border-stone-500 max-w-md md:max-w-lg"
 export default function Input({label,error,isTextarea = false,...props})
 {
     return (

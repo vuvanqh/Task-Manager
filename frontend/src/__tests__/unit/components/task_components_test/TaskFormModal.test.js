@@ -1,4 +1,4 @@
-import {render, screen, fireEvent} from "@testing-library/react"
+import {render, screen, fireEvent, waitFor} from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom";
 import TaskFormModal from "../../../../components/task_components/TaskFormModal"
 import * as tasks from "../../../../api/tasks"
@@ -17,6 +17,12 @@ describe("TaskFormModal", () => {
 
         fireEvent.change(screen.getByPlaceholderText("Task Title"), { target: { value: "New" } });
         fireEvent.submit(screen.getByText("Create").closest("form"));
+
+        await waitFor(() => {
+           expect(tasks.createTask).toHaveBeenCalled();
+           expect(onSaved).toHaveBeenCalled();
+           expect(onClose).toHaveBeenCalled();
+        });
     });
 
     test("Edits when editData provided", async () => {
@@ -29,5 +35,10 @@ describe("TaskFormModal", () => {
         </MemoryRouter>);
        
         fireEvent.submit(screen.getByText("Save").closest("form"));
+        await waitFor(() => {
+           expect(tasks.editTask).toHaveBeenCalled();
+           expect(onSaved).toHaveBeenCalled();
+           expect(onClose).toHaveBeenCalled();
+        });
     });
 });

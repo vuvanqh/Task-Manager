@@ -28,7 +28,7 @@ export default function ProjectView()
                 }
                 catch(e) 
                 {
-                    aleft("Failed to load project");
+                    alert("Failed to load project");
                 }
                 finally
                 {
@@ -40,7 +40,7 @@ export default function ProjectView()
 
     async function handleDelete()
     {
-        if(!confirm("Delete task?")) return;
+        if(!confirm("Delete Project?")) return;
         try {
             await deleteProject(project.id);
             const num = localStorage.getItem("project_number");

@@ -1,9 +1,9 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
-jest.mock("jwt-decode", () => jest.fn());
+jest.mock("jwt-decode", () => ({jwtDecode: jest.fn()}))
 
 describe("ProtectedRoute", () => {
   afterEach(() => {
@@ -21,7 +21,7 @@ describe("ProtectedRoute", () => {
         </Routes>
       </MemoryRouter>
     );
-  
+    expect(screen.getByText("Login")).toBeInTheDocument();
   });
 
   test("Allows when token and role matches", () => {
@@ -31,8 +31,11 @@ describe("ProtectedRoute", () => {
       <MemoryRouter initialEntries={["/protected"]}>
         <Routes>
           <Route path="/protected" element={<ProtectedRoute roles={["admin"]}><div>Secret</div></ProtectedRoute>} />
+          <Route path="/login" element={<div>Login Page</div>} />
+          <Route path="/projects" element={<div>Projects Page</div>} />
         </Routes>
       </MemoryRouter>
     );
+    expect(screen.getByText("Secret")).toBeInTheDocument();
   });
 });

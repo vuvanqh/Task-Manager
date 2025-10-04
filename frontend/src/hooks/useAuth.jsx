@@ -8,6 +8,12 @@ export function useAuth() {
         if(!token) return null;
         try {
             const payload = jwtDecode(token);
+            if(payload.exp && Date.now()/1000 > payload.exp)
+            {
+                localStorage.removeItem("token");
+                return null;
+            }
+            
             return {
                 username: payload.sub, 
                 role: payload.role, 

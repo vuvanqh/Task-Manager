@@ -41,7 +41,7 @@ export default function TaskFormModal({onClose, onSaved, projectId, editData,tas
                     onClose={onClose}>
             <Input label = "Task Title" value={title} onChange={ e => setTitle(e.target.value)} placeholder="Task Title" required/>
             <Input label = "Task Description" value={description} onChange={ e => setDescription(e.target.value)} placeholder="Task Description" rows={4} isTextarea={true}/>
-            <Input label = "Task Priority" type="number" value={priority} onChange={e => setPriority(e.target.value)} min={1} max={5}/>
+            <Input label = "Task Priority" type="number" value={priority} onChange={e => setPriority(parseInt(e.target.value))} min={1} max={5}/>
             <Input label = "Assigned To" type="number" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} placeholder="User Id" min={1} max={5}/>
         </FormModal>
     )

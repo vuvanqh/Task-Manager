@@ -21,6 +21,7 @@ export default function RegisterPage()
         if(form.password!==form.confirmPassword) 
         {
             setError("Passwords don't match")
+            setLoading(false);
             return;
         }
 

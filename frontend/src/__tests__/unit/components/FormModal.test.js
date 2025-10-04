@@ -28,5 +28,6 @@ describe("Form Modal", () => {
         );
         const form = screen.getByText("Testing Text").closest("form")
         fireEvent.submit(form)
+        expect(fn).toHaveBeenCalled();
     })
 })

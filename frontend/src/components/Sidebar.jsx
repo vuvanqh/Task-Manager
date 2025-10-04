@@ -7,14 +7,13 @@ export default function Sidebar({ selectedID, onSelect, canCreate = true, onCrea
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("");
-
+    const [open, setOpen] = useState(false);
     async function load()
     {
         setLoading(true);
         try {
             const data = await getProjects();
             setProjects(data);
-            localStorage.setItem("project_number",projects.length);
         }
         catch(e) {
             console.error(e);
@@ -24,10 +23,11 @@ export default function Sidebar({ selectedID, onSelect, canCreate = true, onCrea
         }
     }
 
-    useEffect(() => {load()}, [localStorage.getItem("project_number")]);
+    useEffect(() => {load()}, [onSelect]);
     const filtered = projects.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
 
-    return <aside className="w-1/4 px-8 py-16 bg-black text-stone-50 md:w-72 rounded-r-xl">
+    return <>
+    <aside className={`w-1/4 px-8 py-16 bg-black text-stone-50 md:w-72 transform md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`}>
         <h2 className="font-bold mb-8 uppercase md:text-xl text-stone-50">Your Projects</h2>
         <div>
             {canCreate && <Button onClick={onCreateClick}>+ New Project</Button>}
@@ -35,15 +35,16 @@ export default function Sidebar({ selectedID, onSelect, canCreate = true, onCrea
         <input placeholder="Filter..."
                value={filter}
                onChange={(e)=>setFilter(e.target.value)}
-               className="p-2 rounded text-black"
+               className="p-2 rounded text-black mt-2 mb-2 w-full"
         />
-        <div className="overflow-auto flex-1 space-y-2">
+        <ul className="overflow-auto flex-1 space-y-2">
             {loading ? <div>Loading...</div>:
             filtered.map( p => (
-                <div key={p.id} onClick={() => onSelect(p)} className={`p-2 rounded cursor-pointer hover:bg-stone-700 ${p.id === selectedID ? "bg-stone-600 font-bold": "hover:bg-stone-800"}`}>
+                <li key={p.id} onClick={() => onSelect(p)} className={`p-2 rounded cursor-pointer hover:bg-stone-700 ${p.id === selectedID ? "bg-stone-600 font-bold": "hover:bg-stone-800"}`}>
                     <div className="font-semibold">{p.name}</div>
-                </div>
+                </li>
             ))}
-        </div>
+        </ul>
     </aside>
+    </>
 };
