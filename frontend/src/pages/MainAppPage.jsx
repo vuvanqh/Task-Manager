@@ -20,7 +20,7 @@ export default function MainAppPage({auth})
     }
     useEffect(()=>setReload(reload+1),[]);
     return (
-        <div className="min-h-screen flex flex-col" key={reload}>
+        <div className="min-h-screen flex flex-col">
             <TopNav user={{username: localStorage.getItem("username"), role: localStorage.getItem("role")}} onLogout={handleLogout}/>
             <div className="flex flex-1 overflow-hidden">
                     <Sidebar selectedID={selectedProject?.id}

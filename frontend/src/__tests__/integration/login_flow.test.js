@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginPage from "../../pages/LoginPage";
 import * as auth from "../../api/auth";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -24,5 +24,22 @@ describe("Login flow", () => {
     fireEvent.click(screen.getByText("Login", { selector: "button" }));
 
     expect(auth.login).toHaveBeenCalledWith("u", "p");
+  });
+
+  test("Shows error on invalid login", async () => {
+    auth.login.mockRejectedValueOnce({ response: { data: { detail: "Invalid credentials" } } });
+
+    render( <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </MemoryRouter>);
+    fireEvent.change(screen.getByPlaceholderText(/username/i), { target: { value: "wrong" } });
+    fireEvent.change(screen.getByPlaceholderText(/password/i), { target: { value: "badpass" } });
+    fireEvent.click(screen.getByText(/login/i, { selector: "button" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
+    });
   });
 });

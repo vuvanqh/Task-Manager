@@ -15,9 +15,9 @@ export default function TaskList({projectId,onClick,reload}) {
             const t = await getTasksForProject(projectId);
             setTasks(t);
         }
-        catch
+        catch(err)
         {
-            alert("failed to load tasks");
+            alert(err.response?.data?.detail || err.message || "failed to load tasks");
         }
         finally
         {
@@ -30,9 +30,9 @@ export default function TaskList({projectId,onClick,reload}) {
             await completeTask(id);
             reload();   
         }
-        catch
+        catch(err)
         {
-            alert("failed to mark complete");
+            alert(err.response?.data?.detail || err.message || "failed to mark complete");
         }
     }
 
@@ -46,11 +46,11 @@ export default function TaskList({projectId,onClick,reload}) {
                     Tasks
                 </h1>
                 
-                <Button onClick={onClick}>+ New Task</Button>
+                <Button onClick={onClick} disabled={localStorage.getItem("role")=="user"}>+ New Task</Button>
             </div>
             <input value={filter} placeholder='Filter...' className="w-full p-1 mb-4 border-2 rounded-sm border-stone-300 bg-stone-200 text-stone-600 focus:outline-none focus:border-stone-500" onChange={ (e) => setFilter(e.target.value)}/>
                 {loading ? <div>Loading...</div>:  tasks.length===0? <div>No tasks yet</div> : 
-                <table className="min-w-full">
+                <div className="min-w-full">
                     <ul className="space-y-2">
                         {filtered.map(t => (
                             <li key={t.id} className={`p-3 border rounded ${t.status=="completed"?"bg-green-400 hover:bg-green-300":"bg-white hover:bg-stone-100"}`}>
@@ -63,7 +63,7 @@ export default function TaskList({projectId,onClick,reload}) {
                             </li>
                         ))}
                     </ul>
-                </table>
+                </div>
                 }
          </section>
         </>

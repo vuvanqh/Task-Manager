@@ -37,7 +37,7 @@ export default function LoginPage()
             navigate("/projects",{replace:true});
         }
         catch(err){
-            setError(err.message || "Login Failed");
+            setError(err.response?.data?.detail || err.message || "Login Failed");
         }
     }
 

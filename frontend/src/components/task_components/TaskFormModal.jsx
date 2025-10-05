@@ -29,8 +29,8 @@ export default function TaskFormModal({onClose, onSaved, projectId, editData,tas
             }
             onSaved();
             onClose();  
-        } catch(e) {
-            setError(e?.response?.data?.detail || e.message || "ERROR");
+        } catch(err) {
+            setError(err?.response?.data?.detail || err.message || "ERROR");
         }
     }
 

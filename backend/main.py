@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://51.21.202.23:5173"],
+    allow_origins=["http://localhost:5173", "http://51.21.202.23:5173", "https://steady-blini-d7510d.netlify.app"],
     allow_credentials=True, 
     allow_methods=["*"],
     allow_headers=["*"]

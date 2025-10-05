@@ -2,7 +2,7 @@ import axios from "axios";
 import client from "./client"
 
 const oauthClient = axios.create({
-    baseURL: "http://51.21.202.23:8000",
+    baseURL: "/api", //"http://51.21.202.23:8000",
     headers: {"Content-Type": "application/x-www-form-urlencoded"}
 });
 oauthClient.interceptors.request.use((config) => {

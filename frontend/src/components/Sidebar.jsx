@@ -27,7 +27,13 @@ export default function Sidebar({ selectedID, onSelect, canCreate = true, onCrea
     const filtered = projects.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
 
     return <>
-    <aside className={`w-1/4 px-8 py-16 bg-black text-stone-50 md:w-72 transform md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`}>
+    <button
+      className="md:hidden p-2 m-2 text-white bg-gray-800 rounded z-50 fixed top-4 left-4"
+      onClick={() => setOpen(!open)}
+    >
+      ≡
+    </button>
+    <aside className={`w-1/3 px-8 py-16 bg-black text-stone-50 md:w-72 transform md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`}>
         <h2 className="font-bold mb-8 uppercase md:text-xl text-stone-50">Your Projects</h2>
         <div>
             {canCreate && <Button onClick={onCreateClick}>+ New Project</Button>}

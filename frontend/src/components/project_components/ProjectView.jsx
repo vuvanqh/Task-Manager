@@ -49,7 +49,7 @@ export default function ProjectView()
         }
         catch(e)
         {
-            alert("Failed to delete" + e.message);
+            alert(err.response?.data?.detail || err.message || "Failed to delete");
         }
     }
     if(loading || !project)
@@ -61,7 +61,7 @@ export default function ProjectView()
                     <h1 className="text-5xl font-bold text-stone-600 mb-2">
                         {project.name}
                     </h1>
-                    <Button onClick={handleDelete}>Delete</Button>
+                    <Button onClick={handleDelete} disabled={localStorage.getItem("role")=="user"}>Delete</Button>
                 </div>
                 <div>
                     <p className="text-stone-600 whitespace-pre-wrap py-5">{project.description}</p>

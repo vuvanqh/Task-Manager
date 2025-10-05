@@ -25,8 +25,8 @@ export default function ResetConfirmPage()
             await confirmReset(form.token, form.new_password);
             navigate("/login");
         }
-        catch(e) {
-            setErr(e?.message || "Failed");
+        catch(err) {
+            setErr(err.response?.data?.detail || err?.message || "Failed");
         }
     }
 

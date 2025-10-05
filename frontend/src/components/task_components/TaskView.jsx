@@ -18,7 +18,7 @@ export default function TaskView()
         }
         catch
         {
-            alert("failed to load task");
+            alert(err.response?.data?.detail || err.message || "failed to load task");
         }
     }
 
@@ -28,9 +28,9 @@ export default function TaskView()
             await deleteTask(taskId);
             navigate(`/projects/${task.project_id}`);
         }
-        catch
+        catch(err)
         {
-            alert("failed to delete task")
+            alert(err.response?.data?.detail || err.message ||"failed to delete task")
         }
     }
 
@@ -47,10 +47,10 @@ export default function TaskView()
                 <p>Assigned to: {task.assigned_to || "Unassigned"}</p>
             </div>
             <div className="flex-col gap-1">
-                <button onClick={()=>setEditing(task)} className="px-4 py-2 bg-stone-950 text-white rounded-md hover:bg-stone-800">
+                <button onClick={()=>setEditing(task)} className="px-4 py-2 bg-stone-950 text-white rounded-md hover:bg-stone-800" disabled={localStorage.getItem("role")=="user"}>
                     Edit
                 </button>
-                <button onClick={handleDelete} className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 ml-1">
+                <button onClick={handleDelete} className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 ml-1" disabled={localStorage.getItem("role")=="user"}>
                     Delete
                 </button>
             </div>

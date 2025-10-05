@@ -36,7 +36,7 @@ export default function RegisterPage()
         }
         catch(err)
         {
-            setError(err.message || "Failed to register");
+            setError(err.response?.data?.detail || err.message || "Failed to register");
         }
         finally
         {

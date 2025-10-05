@@ -20,9 +20,9 @@ export default function ResetRequestPage() {
             console.log("oke");
             navigate("/reset/confirm");
         }
-        catch(e)
+        catch(err)
         {
-            setErr("Failed to request reset");
+            setErr(err.response?.data?.detail || err.message || "Failed to request reset");
         }
         finally{
             setLoading(false)
